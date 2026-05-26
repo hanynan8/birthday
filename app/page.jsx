@@ -30,13 +30,13 @@ const WISHES = [
 
 const SEGMENTS = [
   { label: "💸 100 جنيه كاش", color: "#f7c948", textColor: "#1a0a2e", isPrize: true  },
-  { label: "🎉 حاول تاني",    color: "#a855f7", textColor: "#fff",    isPrize: false },
-  { label: "❤️ بالتوفيق",    color: "#ff6eb4", textColor: "#fff",    isPrize: false },
-  { label: "🎊 هديه قريباً", color: "#2563eb", textColor: "#fff",    isPrize: false },
-  { label: "✨ يلا تاني",    color: "#16a34a", textColor: "#fff",    isPrize: false },
-  { label: "🌟 محظوظ!",      color: "#dc2626", textColor: "#fff",    isPrize: false },
-  { label: "🎁 مفاجأه",      color: "#0891b2", textColor: "#fff",    isPrize: false },
-  { label: "💫 يالا تاني",   color: "#7c3aed", textColor: "#fff",    isPrize: false },
+  { label: "ايفون 19 برو ماكس",    color: "#a855f7", textColor: "#fff",    isPrize: false },
+  { label: "موقع ويب",    color: "#ff6eb4", textColor: "#fff",    isPrize: false },
+  { label: "سامسونج الترا 77", color: "#2563eb", textColor: "#fff",    isPrize: false },
+  { label: "عربية تطلع بيها الجبل",    color: "#16a34a", textColor: "#fff",    isPrize: false },
+  { label: "ارجعلك ادواتك بتاعت الكيميا",      color: "#dc2626", textColor: "#fff",    isPrize: false },
+  { label: "10 جنية كاش",      color: "#0891b2", textColor: "#fff",    isPrize: false },
+  { label: "اهكر موبايلك",   color: "#7c3aed", textColor: "#fff",    isPrize: false },
 ];
 const PRIZE_INDEX = 0;
 
@@ -549,31 +549,57 @@ function LuckyWheel({ onPrize }) {
 
   const SEG  = SEGMENTS.length;
   const SARAD = (2 * Math.PI) / SEG;
+function draw(a) {
+  const c = canvasRef.current; if (!c) return;
+  const ctx = c.getContext("2d");
+  const cx = c.width / 2, cy = c.height / 2, r = cx - 6;
+  ctx.clearRect(0, 0, c.width, c.height);
 
-  function draw(a) {
-    const c = canvasRef.current; if (!c) return;
-    const ctx = c.getContext("2d");
-    const cx = c.width / 2, cy = c.height / 2, r = cx - 6;
-    ctx.clearRect(0, 0, c.width, c.height);
-    SEGMENTS.forEach((seg, i) => {
-      const s = a + i * SARAD - Math.PI / 2, e = s + SARAD;
-      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, s, e); ctx.closePath();
-      ctx.fillStyle = seg.color; ctx.fill();
-      ctx.strokeStyle = "rgba(255,255,255,.25)"; ctx.lineWidth = 1.5; ctx.stroke();
-      ctx.save(); ctx.translate(cx, cy); ctx.rotate(s + SARAD / 2);
-      ctx.textAlign = "right"; ctx.fillStyle = seg.textColor;
-      ctx.font = `bold ${c.width < 280 ? 9 : 11}px Cairo`;
-      ctx.shadowColor = "rgba(0,0,0,.2)"; ctx.shadowBlur = 2;
-      ctx.fillText(seg.label, r - 10, 5); ctx.restore();
-    });
-    const cg = ctx.createRadialGradient(cx, cy, 3, cx, cy, 32);
-    cg.addColorStop(0, "#e8c050"); cg.addColorStop(1, "#a07008");
-    ctx.beginPath(); ctx.arc(cx, cy, 30, 0, 2 * Math.PI);
-    ctx.shadowColor = "rgba(201,150,10,.6)"; ctx.shadowBlur = 14; ctx.fillStyle = cg; ctx.fill();
-    ctx.shadowBlur = 0; ctx.fillStyle = "#3c2808"; ctx.font = "bold 16px Cairo";
-    ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("🎂", cx, cy);
-  }
+  SEGMENTS.forEach((seg, i) => {
+    const s = a + i * SARAD - Math.PI / 2;
+    const e = s + SARAD;
+    const mid = s + SARAD / 2;
 
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, s, e); ctx.closePath();
+    ctx.fillStyle = seg.color; ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,.3)"; ctx.lineWidth = 1.5; ctx.stroke();
+
+    // النص: في منتصف الشريحة بالتدوير
+    const textR = r * 0.68;
+    const tx = cx + Math.cos(mid) * textR;
+    const ty = cy + Math.sin(mid) * textR;
+
+    ctx.save();
+    ctx.translate(tx, ty);
+    ctx.rotate(mid + Math.PI / 2);  // النص يتبع اتجاه الشريحة
+    const fontSize = c.width < 280 ? 10 : 12;
+    ctx.font = `bold ${fontSize}px Cairo, sans-serif`;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillStyle = seg.textColor;
+    ctx.shadowColor = "rgba(0,0,0,.35)"; ctx.shadowBlur = 3;
+
+    // فصل النص لسطرين لو فيه أكتر من كلمة
+    const words = seg.label.split(" ");
+    if (words.length >= 2) {
+      const half = Math.ceil(words.length / 2);
+      ctx.fillText(words.slice(0, half).join(" "), 0, -fontSize * 0.7);
+      ctx.fillText(words.slice(half).join(" "), 0, +fontSize * 0.7);
+    } else {
+      ctx.fillText(seg.label, 0, 0);
+    }
+    ctx.restore();
+  });
+
+  // الزر الأوسط
+  const cg = ctx.createRadialGradient(cx, cy, 3, cx, cy, 28);
+  cg.addColorStop(0, "#e8c050"); cg.addColorStop(1, "#a07008");
+  ctx.shadowColor = "rgba(201,150,10,.6)"; ctx.shadowBlur = 14;
+  ctx.beginPath(); ctx.arc(cx, cy, 28, 0, 2 * Math.PI);
+  ctx.fillStyle = cg; ctx.fill(); ctx.shadowBlur = 0;
+  ctx.fillStyle = "#3c2808"; ctx.font = "bold 16px Cairo";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText("🎂", cx, cy);
+}
   useEffect(() => { draw(0); }, [size]);
 
   function spin() {
