@@ -214,7 +214,7 @@ function Envelope({ onOpen }) {
       <div className="relative z-10 flex flex-col items-center gap-8 px-6 w-full">
         {!open && (
           <span style={{ fontFamily: "'Cairo',sans-serif", fontSize: "clamp(1.2rem,4vw,1.7rem)", color: T.accent, animation: "blink 2.2s ease-in-out infinite", letterSpacing: ".08em", textAlign: "center" }}>
-            🎂 افتح هديتك! 🎂
+            🎂 افتح الظرف 🎂
           </span>
         )}
 
